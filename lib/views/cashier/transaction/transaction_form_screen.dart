@@ -193,139 +193,293 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
   @override
   Widget build(BuildContext context) {
     final currency = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ');
-
+    final themeGradient = const LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        Color(0xFF8D6E63), // coklat muda
+        Color(0xFF4E342E), // coklat tua
+        Color(0xFFD7CCC8), // cream
+      ],
+    );
     return Scaffold(
-      appBar: AppBar(title: Text('Tambah Transaksi')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextFormField(
-              controller: dateController,
-              readOnly: true,
-              decoration: InputDecoration(
-                labelText: 'Tanggal Transaksi',
-                suffixIcon: Icon(Icons.calendar_today),
-              ),
-              onTap: pickDateTime,
-            ),
-            SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              decoration: InputDecoration(labelText: 'Metode Pembayaran'),
-              value: selectedPaymentMethod,
-              items: paymentMethodOptions
-                  .map((method) =>
-                      DropdownMenuItem(value: method, child: Text(method)))
-                  .toList(),
-              onChanged: (val) => setState(() {
-                selectedPaymentMethod = val!;
-              }),
-            ),
-            SizedBox(height: 16),
-            if (categories.isNotEmpty)
-              DropdownButtonFormField<CategoryModel>(
-                decoration: InputDecoration(labelText: 'Kategori'),
-                value: selectedCategory,
-                items: categories
-                    .map((cat) => DropdownMenuItem(
-                        value: cat, child: Text(cat.categoryName)))
-                    .toList(),
-                onChanged: (val) {
-                  setState(() {
-                    selectedCategory = val;
-                    selectedProduct = null;
-                    products = [];
-                    fetchProducts();
-                  });
-                },
-              ),
-            SizedBox(height: 16),
-            if (products.isNotEmpty)
-              DropdownButtonFormField<ProductModel>(
-                decoration: InputDecoration(labelText: 'Produk'),
-                value: selectedProduct,
-                items: products
-                    .map((prod) => DropdownMenuItem(
-                          value: prod,
-                          child:
-                              Text('${prod.productName} (Stok: ${prod.stock})'),
-                        ))
-                    .toList(),
-                onChanged: (val) {
-                  setState(() {
-                    selectedProduct = val;
-                  });
-                },
-              ),
-            if (selectedProduct != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0, bottom: 16.0),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Stok tersedia: ${selectedProduct!.stock}',
-                    style: TextStyle(color: Colors.grey[700]),
-                  ),
-                ),
-              ),
-            Row(
-              children: [
-                Text('Qty:'),
-                SizedBox(width: 8),
-                Expanded(
-                  child: TextFormField(
-                    initialValue: '1',
-                    keyboardType: TextInputType.number,
-                    onChanged: (val) {
-                      quantity = int.tryParse(val) ?? 1;
-                    },
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: addToCart,
-                  child: Text('Tambah Produk'),
-                ),
-              ],
-            ),
-            SizedBox(height: 24),
-            Divider(),
-            Text('Produk dalam Transaksi',
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            SizedBox(height: 8),
-            ...cart.asMap().entries.map((entry) {
-              final index = entry.key;
-              final item = entry.value;
-              return ListTile(
-                title: Text(item['product_name']),
-                subtitle: Text(
-                    'Qty: ${item['quantity']} • Harga: ${currency.format(item['price'])}'),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(currency.format(item['subtotal'])),
-                    IconButton(
-                      icon: Icon(Icons.delete, color: Colors.red),
-                      onPressed: () => removeFromCart(index),
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: const Text(
+          'Tambah Transaksi',
+          style: TextStyle(
+            fontWeight: FontWeight.w900,
+            fontSize: 20,
+            letterSpacing: 1.2,
+            fontFamily: 'Montserrat',
+            color: Colors.white,
+          ),
+        ),
+      ),
+      body: Container(
+        decoration: BoxDecoration(gradient: themeGradient),
+        child: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final minHeight = constraints.maxHeight;
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: minHeight),
+                  child: IntrinsicHeight(
+                    child: Center(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 18),
+                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 22),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.13),
+                          borderRadius: BorderRadius.circular(28),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.10),
+                              blurRadius: 18,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            TextFormField(
+                              controller: dateController,
+                              readOnly: true,
+                              style: const TextStyle(color: Colors.white, fontFamily: 'Montserrat'),
+                              decoration: InputDecoration(
+                                labelText: 'Tanggal Transaksi',
+                                labelStyle: TextStyle(color: Colors.white.withOpacity(0.85)),
+                                suffixIcon: const Icon(Icons.calendar_today, color: Colors.white70),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(color: Colors.white.withOpacity(0.25)),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(color: Colors.white),
+                                ),
+                                filled: true,
+                                fillColor: Colors.white.withOpacity(0.07),
+                              ),
+                              onTap: pickDateTime,
+                            ),
+                            const SizedBox(height: 16),
+                            DropdownButtonFormField<String>(
+                              decoration: InputDecoration(
+                                labelText: 'Metode Pembayaran',
+                                labelStyle: TextStyle(color: Colors.white.withOpacity(0.85)),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(color: Colors.white.withOpacity(0.25)),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: const BorderSide(color: Colors.white),
+                                ),
+                                filled: true,
+                                fillColor: Colors.white.withOpacity(0.07),
+                              ),
+                              dropdownColor: const Color(0xFF4E342E),
+                              style: const TextStyle(color: Colors.white, fontFamily: 'Montserrat'),
+                              value: selectedPaymentMethod,
+                              items: paymentMethodOptions
+                                  .map((method) =>
+                                      DropdownMenuItem(value: method, child: Text(method, style: const TextStyle(color: Colors.white))))
+                                  .toList(),
+                              onChanged: (val) => setState(() {
+                                selectedPaymentMethod = val!;
+                              }),
+                            ),
+                            const SizedBox(height: 16),
+                            if (categories.isNotEmpty)
+                              DropdownButtonFormField<CategoryModel>(
+                                decoration: InputDecoration(
+                                  labelText: 'Kategori',
+                                  labelStyle: TextStyle(color: Colors.white.withOpacity(0.85)),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                    borderSide: BorderSide(color: Colors.white.withOpacity(0.25)),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                    borderSide: const BorderSide(color: Colors.white),
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.white.withOpacity(0.07),
+                                ),
+                                dropdownColor: const Color(0xFF4E342E),
+                                style: const TextStyle(color: Colors.white, fontFamily: 'Montserrat'),
+                                value: selectedCategory,
+                                items: categories
+                                    .map((cat) => DropdownMenuItem(
+                                        value: cat, child: Text(cat.categoryName, style: const TextStyle(color: Colors.white))))
+                                    .toList(),
+                                onChanged: (val) {
+                                  setState(() {
+                                    selectedCategory = val;
+                                    selectedProduct = null;
+                                    products = [];
+                                    fetchProducts();
+                                  });
+                                },
+                              ),
+                            const SizedBox(height: 16),
+                            if (products.isNotEmpty)
+                              DropdownButtonFormField<ProductModel>(
+                                decoration: InputDecoration(
+                                  labelText: 'Produk',
+                                  labelStyle: TextStyle(color: Colors.white.withOpacity(0.85)),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                    borderSide: BorderSide(color: Colors.white.withOpacity(0.25)),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                    borderSide: const BorderSide(color: Colors.white),
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.white.withOpacity(0.07),
+                                ),
+                                dropdownColor: const Color(0xFF4E342E),
+                                style: const TextStyle(color: Colors.white, fontFamily: 'Montserrat'),
+                                value: selectedProduct,
+                                items: products
+                                    .map((prod) => DropdownMenuItem(
+                                          value: prod,
+                                          child:
+                                              Text('${prod.productName} (Stok: ${prod.stock})', style: const TextStyle(color: Colors.white)),
+                                        ))
+                                    .toList(),
+                                onChanged: (val) {
+                                  setState(() {
+                                    selectedProduct = val;
+                                  });
+                                },
+                              ),
+                            if (selectedProduct != null)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0, bottom: 16.0),
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    'Stok tersedia: ${selectedProduct!.stock}',
+                                    style: const TextStyle(color: Colors.white70, fontFamily: 'Montserrat'),
+                                  ),
+                                ),
+                              ),
+                            Row(
+                              children: [
+                                const Text('Qty:', style: TextStyle(color: Colors.white, fontFamily: 'Montserrat')),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: TextFormField(
+                                    initialValue: '1',
+                                    keyboardType: TextInputType.number,
+                                    style: const TextStyle(color: Colors.white, fontFamily: 'Montserrat'),
+                                    decoration: InputDecoration(
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: BorderSide(color: Colors.white.withOpacity(0.25)),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        borderSide: const BorderSide(color: Colors.white),
+                                      ),
+                                      filled: true,
+                                      fillColor: Colors.white.withOpacity(0.07),
+                                    ),
+                                    onChanged: (val) {
+                                      quantity = int.tryParse(val) ?? 1;
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF795548),
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                    textStyle: const TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.bold),
+                                  ),
+                                  onPressed: addToCart,
+                                  child: const Text('Tambah Produk'),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 24),
+                            const Divider(color: Colors.white24),
+                            const Text('Produk dalam Transaksi',
+                                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontFamily: 'Montserrat')),
+                            const SizedBox(height: 8),
+                            ...cart.asMap().entries.map((entry) {
+                              final index = entry.key;
+                              final item = entry.value;
+                              return Container(
+                                margin: const EdgeInsets.symmetric(vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.10),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: ListTile(
+                                  title: Text(item['product_name'], style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontFamily: 'Montserrat')),
+                                  subtitle: Text('Qty: ${item['quantity']} • Harga: ${currency.format(item['price'])}', style: const TextStyle(color: Colors.white70, fontFamily: 'Montserrat')),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(currency.format(item['subtotal']), style: const TextStyle(color: Color(0xFFFFD54F), fontWeight: FontWeight.bold)),
+                                      IconButton(
+                                        icon: const Icon(Icons.delete, color: Colors.red),
+                                        onPressed: () => removeFromCart(index),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }),
+                            const Divider(color: Colors.white24),
+                            ListTile(
+                              title: const Text('Total Belanja', style: TextStyle(color: Colors.white, fontFamily: 'Montserrat')),
+                              trailing: Text(
+                                currency.format(totalPrice),
+                                style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFFD54F), fontFamily: 'Montserrat'),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 48,
+                              child: ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  backgroundColor: const Color(0xFF795548),
+                                  foregroundColor: Colors.white,
+                                  textStyle: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Montserrat',
+                                  ),
+                                ),
+                                onPressed: cart.isEmpty ? null : submitTransaction,
+                                icon: const Icon(Icons.payment),
+                                label: const Text('Proses Pembayaran'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ],
+                  ),
                 ),
               );
-            }),
-            Divider(),
-            ListTile(
-              title: Text('Total Belanja'),
-              trailing: Text(
-                currency.format(totalPrice),
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-            SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: cart.isEmpty ? null : submitTransaction,
-              icon: Icon(Icons.payment),
-              label: Text('Proses Pembayaran'),
-            ),
-          ],
+            },
+          ),
         ),
       ),
     );

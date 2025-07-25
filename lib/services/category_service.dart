@@ -4,7 +4,7 @@ import '../models/category_model.dart';
 
 class CategoryService {
   final String token;
-  final String baseUrl = 'http://192.168.1.6:8000/api'; // Ganti jika URL berbeda
+  final String baseUrl = 'http://192.168.43.252:8000/api'; // Ganti jika URL berbeda
 
   CategoryService(this.token);
 

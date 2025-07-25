@@ -57,9 +57,33 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeGradient = const LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        Color(0xFF8D6E63), // coklat muda
+        Color(0xFF4E342E), // coklat tua
+        Color(0xFFD7CCC8), // cream
+      ],
+    );
     return Scaffold(
-      appBar: AppBar(title: Text('Kategori')),
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: const Text(
+          'Kelola Kategori',
+          style: TextStyle(
+            fontWeight: FontWeight.w900,
+            fontSize: 20,
+            letterSpacing: 1.2,
+            fontFamily: 'Montserrat',
+            color: Colors.white,
+          ),
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xFF795548),
         onPressed: () async {
           await Navigator.push(
             context,
@@ -67,42 +91,61 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
           );
           fetchData();
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add, color: Colors.white),
       ),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: categories.length,
-              itemBuilder: (ctx, i) {
-                final c = categories[i];
-                return Card(
-                  child: ListTile(
-                    title: Text(c.categoryName),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: Icon(Icons.edit),
-                          onPressed: () async {
-                            await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => CategoryFormScreen(token: widget.token, category: c),
-                              ),
-                            );
-                            fetchData();
-                          },
+      body: Container(
+        decoration: BoxDecoration(gradient: themeGradient),
+        child: SafeArea(
+          child: isLoading
+              ? const Center(child: CircularProgressIndicator(color: Color(0xFF795548)))
+              : ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                  itemCount: categories.length,
+                  itemBuilder: (ctx, i) {
+                    final c = categories[i];
+                    return Container(
+                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.13),
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.10),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        title: Text(c.categoryName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontFamily: 'Montserrat')),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit, color: Color(0xFFFFD54F)),
+                              onPressed: () async {
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => CategoryFormScreen(token: widget.token, category: c),
+                                  ),
+                                );
+                                fetchData();
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.redAccent),
+                              onPressed: () => deleteCategory(c.id),
+                            ),
+                          ],
                         ),
-                        IconButton(
-                          icon: Icon(Icons.delete),
-                          onPressed: () => deleteCategory(c.id),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ),
     );
   }
 }

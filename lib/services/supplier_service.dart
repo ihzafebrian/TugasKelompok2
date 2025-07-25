@@ -4,7 +4,7 @@ import '../models/supplier_model.dart';
 
 class SupplierService {
   final String token;
-  final String baseUrl = 'http://192.168.1.6:8000/api/suppliers';
+  final String baseUrl = 'http://192.168.43.252:8000/api/suppliers';
 
   SupplierService(this.token);
 

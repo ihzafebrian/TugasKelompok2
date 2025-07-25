@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LaporanService {
-  final String baseUrl = 'http://192.168.1.6:8000/api'; // Ganti IP sesuai server backend kamu
+  final String baseUrl = 'http://192.168.43.252:8000/api'; // Ganti IP sesuai server backend kamu
 
   Future<String?> _getToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

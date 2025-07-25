@@ -8,6 +8,7 @@ import 'views/owner/dashboard_screen.dart';
 import 'views/owner/laporan_harian_screen.dart';
 import 'views/owner/laporan_bulanan_screen.dart';
 import 'views/owner/laporan_tahunan_screen.dart';
+import 'views/splash_screen.dart';
 
 // Import viewmodel
 import 'viewmodels/auth_viewmodel.dart';
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'POS Flutter',
         theme: ThemeData(primarySwatch: Colors.blue),
-        home: const RootScreen(),
+        home: const SplashScreenWrapper(),
         routes: {
           '/login': (context) => LoginScreen(),
           '/dashboard': (context) => const DashboardScreen(),
@@ -41,6 +42,31 @@ class MyApp extends StatelessWidget {
         },
       ),
     );
+  }
+}
+
+class SplashScreenWrapper extends StatefulWidget {
+  const SplashScreenWrapper({Key? key}) : super(key: key);
+
+  @override
+  State<SplashScreenWrapper> createState() => _SplashScreenWrapperState();
+}
+
+class _SplashScreenWrapperState extends State<SplashScreenWrapper> {
+  bool _showRoot = false;
+
+  void _onSplashFinish() {
+    setState(() {
+      _showRoot = true;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_showRoot) {
+      return const RootScreen();
+    }
+    return SplashScreen(onFinish: _onSplashFinish);
   }
 }
 

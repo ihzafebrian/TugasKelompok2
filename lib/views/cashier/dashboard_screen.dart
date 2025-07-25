@@ -76,12 +76,33 @@ class _KasirDashboardPageState extends State<KasirDashboardPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeGradient = const LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        Color(0xFF8D6E63), // coklat muda
+        Color(0xFF4E342E), // coklat tua
+        Color(0xFFD7CCC8), // cream
+      ],
+    );
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('Dashboard Kasir'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: const Text(
+          'Dashboard Kasir',
+          style: TextStyle(
+            fontWeight: FontWeight.w900,
+            fontSize: 22,
+            letterSpacing: 1.2,
+            fontFamily: 'Montserrat',
+            color: Colors.white,
+          ),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.logout, color: Colors.white),
             tooltip: 'Logout',
             onPressed: () {
               Navigator.of(context).pushReplacementNamed('/');
@@ -89,102 +110,161 @@ class _KasirDashboardPageState extends State<KasirDashboardPage> {
           ),
         ],
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : dashboard == null
-              ? const Center(child: Text('Gagal memuat data'))
-              : Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: ListView(
-                    children: [
-                      Row(
-                        children: [
-                          _infoCard('Total Produk',
-                              dashboard!.totalProduk.toString()),
-                          const SizedBox(width: 16),
-                          _infoCard('Total Supplier',
-                              dashboard!.totalSupplier.toString()),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      const Text(
-                        'Grafik Transaksi (Bulanan)',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 16),
-                      AspectRatio(
-                        aspectRatio: 1.8,
-                        child: dashboard!.grafikTransaksi.isEmpty
-                            ? const Center(child: Text('Tidak ada data grafik'))
-                            : LineChart(
-                                LineChartData(
-                                  minX: 0,
-                                  maxX: 11,
-                                  minY: 0,
-                                  maxY: getMaxY(),
-                                  gridData: FlGridData(show: true),
-                                  borderData: FlBorderData(show: true),
-                                  titlesData: FlTitlesData(
-                                    leftTitles: AxisTitles(
-                                      sideTitles: SideTitles(
-                                          showTitles: true,
-                                          interval: (getMaxY() / 5).toDouble(),
-                                          getTitlesWidget: (value, _) {
-                                            return Text(
-                                                value.toInt().toString());
-                                          }),
-                                    ),
-                                    bottomTitles: AxisTitles(
-                                      sideTitles: SideTitles(
-                                        showTitles: true,
-                                        interval: 1,
-                                        getTitlesWidget: (value, _) {
-                                          int index = value.toInt();
-                                          return Padding(
-                                            padding:
-                                                const EdgeInsets.only(top: 8.0),
-                                            child: Text(index >= 0 &&
-                                                    index < months.length
-                                                ? months[index].substring(0, 3)
-                                                : ''),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                  lineBarsData: [
-                                    LineChartBarData(
-                                      spots: generateChartData(
-                                          dashboard!.grafikTransaksi),
-                                      isCurved: true,
-                                      barWidth: 3,
-                                      color: Colors.blue,
-                                      dotData: FlDotData(show: true),
-                                    ),
-                                  ],
+      body: Container(
+        decoration: BoxDecoration(gradient: themeGradient),
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator(color: Color(0xFF795548)))
+            : dashboard == null
+                ? const Center(child: Text('Gagal memuat data', style: TextStyle(color: Colors.white)))
+                : SafeArea(
+                    child: ListView(
+                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+                      children: [
+                        Row(
+                          children: [
+                            _infoCard(
+                              icon: Icons.inventory_2,
+                              title: 'Total Produk',
+                              value: dashboard!.totalProduk.toString(),
+                              color: const Color(0xFF8D6E63),
+                            ),
+                            const SizedBox(width: 16),
+                            _infoCard(
+                              icon: Icons.local_shipping,
+                              title: 'Total Supplier',
+                              value: dashboard!.totalSupplier.toString(),
+                              color: const Color(0xFF4E342E),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 28),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.13),
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.10),
+                                blurRadius: 18,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          padding: const EdgeInsets.all(18),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Grafik Transaksi (Bulanan)',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  fontFamily: 'Montserrat',
+                                  fontSize: 16,
                                 ),
                               ),
-                      ),
-                      const SizedBox(height: 24),
-                      _buildButtonGrid(),
-                      const SizedBox(height: 24),
-                      const Text('Transaksi Terbaru',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 8),
-                      ...dashboard!.transaksiTerbaru.map((transaksi) {
-                        return Card(
-                          elevation: 2,
-                          margin: const EdgeInsets.symmetric(vertical: 4),
-                          child: ListTile(
-                            title: Text(transaksi.kode),
-                            subtitle: Text(transaksi.tanggal),
-                            trailing: Text('Rp ${transaksi.total}'),
+                              const SizedBox(height: 16),
+                              AspectRatio(
+                                aspectRatio: 1.8,
+                                child: dashboard!.grafikTransaksi.isEmpty
+                                    ? const Center(child: Text('Tidak ada data grafik', style: TextStyle(color: Colors.white70)))
+                                    : LineChart(
+                                        LineChartData(
+                                          minX: 0,
+                                          maxX: 11,
+                                          minY: 0,
+                                          maxY: getMaxY(),
+                                          gridData: FlGridData(show: true, drawVerticalLine: false, getDrawingHorizontalLine: (value) => FlLine(color: Colors.white24, strokeWidth: 1)),
+                                          borderData: FlBorderData(show: false),
+                                          titlesData: FlTitlesData(
+                                            leftTitles: AxisTitles(
+                                              sideTitles: SideTitles(
+                                                  showTitles: true,
+                                                  interval: (getMaxY() / 5).toDouble(),
+                                                  getTitlesWidget: (value, _) {
+                                                    return Text(
+                                                      value.toInt().toString(),
+                                                      style: const TextStyle(color: Colors.white70, fontSize: 12),
+                                                    );
+                                                  }),
+                                            ),
+                                            bottomTitles: AxisTitles(
+                                              sideTitles: SideTitles(
+                                                showTitles: true,
+                                                interval: 1,
+                                                getTitlesWidget: (value, _) {
+                                                  int index = value.toInt();
+                                                  return Padding(
+                                                    padding: const EdgeInsets.only(top: 8.0),
+                                                    child: Text(
+                                                      index >= 0 && index < months.length ? months[index].substring(0, 3) : '',
+                                                      style: const TextStyle(color: Colors.white70, fontSize: 12),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                          lineBarsData: [
+                                            LineChartBarData(
+                                              spots: generateChartData(dashboard!.grafikTransaksi),
+                                              isCurved: true,
+                                              barWidth: 3,
+                                              color: const Color(0xFF795548),
+                                              dotData: FlDotData(
+                                                show: true,
+                                                getDotPainter: (spot, percent, barData, index) {
+                                                  return FlDotCirclePainter(
+                                                    radius: 4,
+                                                    color: Colors.white,
+                                                    strokeWidth: 2,
+                                                    strokeColor: const Color(0xFF795548),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                              ),
+                            ],
                           ),
-                        );
-                      }).toList(),
-                    ],
+                        ),
+                        const SizedBox(height: 28),
+                        _buildButtonGrid(),
+                        const SizedBox(height: 28),
+                        const Text('Transaksi Terbaru',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontFamily: 'Montserrat', fontSize: 16)),
+                        const SizedBox(height: 10),
+                        ...dashboard!.transaksiTerbaru.map((transaksi) {
+                          return Container(
+                            margin: const EdgeInsets.symmetric(vertical: 5),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.13),
+                              borderRadius: BorderRadius.circular(18),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.08),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor: const Color(0xFF795548),
+                                child: const Icon(Icons.receipt_long, color: Colors.white),
+                              ),
+                              title: Text(transaksi.kode, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                              subtitle: Text(transaksi.tanggal, style: const TextStyle(color: Colors.white70)),
+                              trailing: Text('Rp ${transaksi.total}', style: const TextStyle(color: Color(0xFFFFD54F), fontWeight: FontWeight.bold)),
+                            ),
+                          );
+                        }).toList(),
+                      ],
+                    ),
                   ),
-                ),
+      ),
     );
   }
 
@@ -198,14 +278,14 @@ class _KasirDashboardPageState extends State<KasirDashboardPage> {
                   context,
                   MaterialPageRoute(
                       builder: (_) => ProductListScreen(token: widget.token)));
-            }),
+            }, color: const Color(0xFF8D6E63)),
             const SizedBox(width: 16),
             _navButton(Icons.category, 'Kelola Kategori', () {
               Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (_) => CategoryListScreen(token: widget.token)));
-            }),
+            }, color: const Color(0xFFD7CCC8)),
           ],
         ),
         const SizedBox(height: 16),
@@ -216,46 +296,89 @@ class _KasirDashboardPageState extends State<KasirDashboardPage> {
                   context,
                   MaterialPageRoute(
                       builder: (_) => SupplierListScreen(token: widget.token)));
-            }),
+            }, color: const Color(0xFF4E342E)),
             const SizedBox(width: 16),
             _navButton(Icons.point_of_sale, 'Transaksi', () {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (_) =>
-                          TransactionListScreen(token: widget.token)));
-            }),
+                      builder: (_) => TransactionListScreen(token: widget.token)));
+            }, color: const Color(0xFFFFD54F)),
           ],
         ),
       ],
     );
   }
 
-  Widget _navButton(IconData icon, String label, VoidCallback onPressed) {
+  Widget _navButton(IconData icon, String label, VoidCallback onPressed, {required Color color}) {
     return Expanded(
-      child: ElevatedButton.icon(
-        icon: Icon(icon),
-        label: Text(label),
-        style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 12)),
-        onPressed: onPressed,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: onPressed,
+        child: Container(
+          height: 90,
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.85),
+            borderRadius: BorderRadius.circular(18),
+            boxShadow: [
+              BoxShadow(
+                color: color.withOpacity(0.18),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: Colors.white, size: 32),
+              const SizedBox(height: 10),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Montserrat',
+                  fontSize: 15,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  Widget _infoCard(String title, String value) {
+  Widget _infoCard({required IconData icon, required String title, required String value, required Color color}) {
     return Expanded(
-      child: Card(
-        elevation: 2,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              Text(value, style: const TextStyle(fontSize: 20)),
-            ],
-          ),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.13),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.10),
+              blurRadius: 14,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 10),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircleAvatar(
+              backgroundColor: color.withOpacity(0.85),
+              radius: 22,
+              child: Icon(icon, color: Colors.white, size: 26),
+            ),
+            const SizedBox(height: 12),
+            Text(title, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontFamily: 'Montserrat', fontSize: 14)),
+            const SizedBox(height: 6),
+            Text(value, style: const TextStyle(fontSize: 22, color: Colors.white, fontWeight: FontWeight.w900, fontFamily: 'Montserrat')),
+          ],
         ),
       ),
     );

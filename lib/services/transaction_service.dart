@@ -5,7 +5,7 @@ import '../models/transaction_detail_model.dart';
 
 class TransactionService {
   final String token;
-  final String baseUrl = 'http://192.168.1.6:8000/api';
+  final String baseUrl = 'http://192.168.43.252:8000/api';
 
   TransactionService(this.token);
 

@@ -3,7 +3,7 @@ import 'dart:convert';
 import '../models/kasirdashboardmodel.dart';
 
 class KasirDashboardService {
-  final String baseUrl = 'http://192.168.1.6:8000/api';
+  final String baseUrl = 'http://192.168.43.252:8000/api';
   final String token; // <- kirim saat inisialisasi
 
   KasirDashboardService(this.token);
