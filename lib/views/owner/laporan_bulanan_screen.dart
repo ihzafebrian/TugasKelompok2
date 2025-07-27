@@ -3,6 +3,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import '../../services/laporan_service.dart';
+import '../../utils/app_theme.dart';
 
 class LaporanBulananScreen extends StatefulWidget {
   const LaporanBulananScreen({super.key});
@@ -88,43 +89,47 @@ class _LaporanBulananScreenState extends State<LaporanBulananScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Laporan Bulanan'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.print),
-            onPressed: () {
-              if (_laporanData.isNotEmpty) {
-                _cetakPDF();
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Data belum tersedia untuk dicetak'),
-                  ),
-                );
-              }
-            },
-          ),
-        ],
-      ),
-      body: FutureBuilder<List<dynamic>>(
-        future: _data,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return ListView(
-              children: snapshot.data!.map((item) {
-                return ListTile(
-                  title: Text('Bulan: ${item['date']}'),
-                  subtitle: Text('Total: Rp ${item['total_sales']}'),
-                  trailing: Text('${item['total_transactions']} transaksi'),
-                );
-              }).toList(),
-            );
-          } else if (snapshot.hasError) {
-            return const Center(child: Text('Gagal memuat data'));
-          }
-          return const Center(child: CircularProgressIndicator());
-        },
+      extendBodyBehindAppBar: true,
+      appBar: AppTheme.themedAppBar('Laporan Bulanan', actions: [
+        IconButton(
+          icon: const Icon(Icons.print, color: Colors.white),
+          onPressed: () {
+            if (_laporanData.isNotEmpty) {
+              _cetakPDF();
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Data belum tersedia untuk dicetak')),
+              );
+            }
+          },
+        ),
+      ]),
+      body: Container(
+        decoration: AppTheme.mainBackground(),
+        child: FutureBuilder<List<dynamic>>(
+          future: _data,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return ListView(
+                children: snapshot.data!.map((item) {
+                  return Card(
+                    color: Colors.white.withOpacity(0.13),
+                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    child: ListTile(
+                      title: Text('Bulan: ${item['date']}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      subtitle: Text('Total: Rp ${item['total_sales']}', style: const TextStyle(color: Colors.white70)),
+                      trailing: Text('${item['total_transactions']} transaksi', style: const TextStyle(color: Colors.white)),
+                    ),
+                  );
+                }).toList(),
+              );
+            } else if (snapshot.hasError) {
+              return const Center(child: Text('Gagal memuat data', style: TextStyle(color: Colors.white)));
+            }
+            return const Center(child: CircularProgressIndicator());
+          },
+        ),
       ),
     );
   }
