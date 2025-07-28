@@ -68,8 +68,10 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     });
     Future.delayed(const Duration(milliseconds: 2400), () async {
       await _outController.forward();
+      if (!mounted) return;
       widget.onFinish();
     });
+
   }
 
   @override
@@ -139,17 +141,11 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                           ],
                         ),
                         padding: const EdgeInsets.all(36),
-                        child: Icon(
-                          Icons.smoking_rooms,
-                          color: Colors.white,
-                          size: 90,
-                          shadows: [
-                            Shadow(
-                              color: Colors.brown.withOpacity(0.4),
-                              blurRadius: 16,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
+                        child: Image.asset(
+                        'lib/assets/images/vape.jpg',
+                        width: 90,
+                        height: 90,
+                        fit: BoxFit.contain,
                         ),
                       ),
                     ),

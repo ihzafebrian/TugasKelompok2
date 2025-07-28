@@ -3,6 +3,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'laporan_menu_screen.dart'; // pastikan file ini ada
 import '../auth/login_screen.dart'; // arahkan ke halaman login setelah logout
 import '../../utils/app_theme.dart';
+import '../splash_screen.dart';
+import '../../main.dart'; // ⬅️ Tambahkan ini
+import '../user/user_list_screen.dart'; // Pastikan path ini benar
+
+
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -29,20 +34,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
-  Future<void> logout() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // Hapus semua data dari SharedPreferences
+Future<void> logout() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.clear();
 
-    // Arahkan ke halaman login
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => LoginScreen()),
-    );
+  if (!mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Berhasil keluar')),
-    );
-  }
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(content: Text('Berhasil keluar')),
+  );
+
+  await Future.delayed(const Duration(milliseconds: 500));
+
+  if (!mounted) return;
+
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(builder: (_) => const SplashScreenWrapper()),
+    (route) => false,
+  );
+}
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -66,16 +80,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         );
                       },
                     ),
-                  ],
-                  if (userRole == 'kasir') ...[
                     ListTile(
-                      leading: const Icon(Icons.point_of_sale, color: Colors.white),
-                      title: const Text('💰 Transaksi Kasir', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      leading: const Icon(Icons.person_add, color: Colors.white),
+                      title: const Text(
+                        '➕ Tambah User',
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
                       onTap: () {
-                        // TODO: arahkan ke halaman kasir
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const UserListScreen()),
+                        );
                       },
                     ),
-                  ],
+                  ],              
                   const Divider(color: Colors.white70),
                   // Tombol Logout
                   ListTile(

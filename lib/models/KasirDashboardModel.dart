@@ -14,17 +14,17 @@ class KasirDashboardModel {
   });
 
   factory KasirDashboardModel.fromJson(Map<String, dynamic> json) {
-    return KasirDashboardModel(
-      totalProduk: json['jumlah_produk'] ?? 0,
-      totalSupplier: json['jumlah_supplier'] ?? 0,
-      totalTransaksi: json['jumlah_transaksi'] ?? 0,
-      grafikTransaksi: (json['grafik_transaksi'] as Map<String, dynamic>)
-          .map((key, value) => MapEntry(key, value as int)),
-      transaksiTerbaru: (json['transaksi_terbaru'] as List<dynamic>)
-          .map((item) => TransaksiTerbaru.fromJson(item))
-          .toList(),
-    );
-  }
+  return KasirDashboardModel(
+    totalProduk: json['total_produk'] ?? 0,
+    totalSupplier: json['total_supplier'] ?? 0,
+    totalTransaksi: json['total_transaksi'] ?? 0, // pastikan key ini juga cocok
+    grafikTransaksi: (json['grafik_transaksi'] as Map<String, dynamic>)
+        .map((key, value) => MapEntry(key, value as int)),
+    transaksiTerbaru: (json['transaksi_terbaru'] as List<dynamic>? ?? [])
+        .map((item) => TransaksiTerbaru.fromJson(item))
+        .toList(),
+  );
+}
 }
 
 class TransaksiTerbaru {

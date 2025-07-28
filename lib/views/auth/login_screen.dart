@@ -90,6 +90,7 @@ class LoginScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   // Ikon rokok
+                  // Ganti bagian ini:
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.13),
@@ -103,10 +104,11 @@ class LoginScreen extends StatelessWidget {
                       ],
                     ),
                     padding: const EdgeInsets.all(28),
-                    child: Icon(
-                      Icons.smoking_rooms,
-                      color: Colors.white,
-                      size: 56,
+                    child: Image.asset(
+                      'lib/assets/images/vape.jpg',
+                      width: 56,
+                      height: 56,
+                      fit: BoxFit.contain,
                     ),
                   ),
                   const SizedBox(height: 24),

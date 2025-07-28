@@ -6,6 +6,8 @@ import 'package:frontend_vaporate/views/cashier/products/product_list_screen.dar
 import 'package:frontend_vaporate/views/cashier/category/category_list_screen.dart';
 import 'package:frontend_vaporate/views/cashier/supplier/supplier_list_screen.dart';
 import 'package:frontend_vaporate/views/cashier/transaction/transaction_list_screen.dart';
+import 'package:frontend_vaporate/views/auth/login_screen.dart';
+
 
 class KasirDashboardPage extends StatefulWidget {
   final String token;
@@ -105,8 +107,12 @@ class _KasirDashboardPageState extends State<KasirDashboardPage> {
             icon: const Icon(Icons.logout, color: Colors.white),
             tooltip: 'Logout',
             onPressed: () {
-              Navigator.of(context).pushReplacementNamed('/');
-            },
+  Navigator.of(context).pushAndRemoveUntil(
+    MaterialPageRoute(builder: (_) => LoginScreen()),
+    (route) => false,
+  );
+},
+
           ),
         ],
       ),

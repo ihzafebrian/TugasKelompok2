@@ -31,6 +31,6 @@ class ProductModel {
 
   String? get imageUrl {
     if (image == null) return null;
-    return 'http://192.168.43.252:8000/storage/$image'; // sesuaikan IP kamu
+    return 'http://192.168.1.89:8000/storage/$image'; // sesuaikan IP kamu
   }
 }
